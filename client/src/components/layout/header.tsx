@@ -34,6 +34,12 @@ export default function Header() {
     startListening();
   };
 
+  const handleHeaderSearch = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
+
   return (
     <>
       <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 border-b">
@@ -76,6 +82,7 @@ export default function Header() {
                     placeholder="Search sustainable beauty..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={handleHeaderSearch}
                     onFocus={() => setIsSearchExpanded(true)}
                     onBlur={() => setIsSearchExpanded(false)}
                     className="pr-20 h-10 rounded-full border-[var(--sage-green)] focus:ring-[var(--forest-green)]"

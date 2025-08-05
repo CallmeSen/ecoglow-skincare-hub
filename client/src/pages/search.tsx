@@ -237,10 +237,10 @@ export default function Search() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[var(--cream-beige)] to-white">
       {/* Search Header */}
-      <div className="bg-white shadow-sm border-b sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 relative">
+      <div className="bg-white shadow-sm border-b sticky top-16 z-40 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 py-4 overflow-hidden">
+          <div className="flex items-center gap-4 overflow-hidden">
+            <div className="flex-1 relative min-w-0">
               <div className="relative">
                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--sage-green)] h-5 w-5" />
                 <Input
@@ -297,20 +297,22 @@ export default function Search() {
           
           {/* Quick Suggestions */}
           {!searchQuery && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="text-sm text-gray-600">Popular:</span>
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setSearchQuery(suggestion);
-                    handleSearch(suggestion);
-                  }}
-                  className="text-sm bg-[var(--sage-green)] text-white px-3 py-1 rounded-full hover:bg-[var(--forest-green)] transition-colors"
-                >
-                  {suggestion}
-                </button>
-              ))}
+            <div className="mt-3 flex flex-wrap gap-2 overflow-hidden">
+              <span className="text-sm text-gray-600 flex-shrink-0">Popular:</span>
+              <div className="flex flex-wrap gap-2 min-w-0">
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setSearchQuery(suggestion);
+                      handleSearch(suggestion);
+                    }}
+                    className="text-sm bg-[var(--sage-green)] text-white px-3 py-1 rounded-full hover:bg-[var(--forest-green)] transition-colors flex-shrink-0"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
