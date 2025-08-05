@@ -20,6 +20,7 @@ export default function Header() {
 
   const navigation = [
     { name: "Products", href: "/products" },
+    { name: "Search", href: "/search" },
     { name: "Quiz", href: "/quiz" },
     { name: "Sustainability", href: "/sustainability" },
     { name: "Blog", href: "/blog" },
@@ -68,7 +69,7 @@ export default function Header() {
             <div className="flex items-center space-x-4">
               {/* Search Bar */}
               <div className="relative hidden md:block">
-                <div className={`flex items-center transition-all duration-300 ${
+                <div className={`relative flex items-center transition-all duration-300 ${
                   isSearchExpanded ? "w-80" : "w-64"
                 }`}>
                   <Input
@@ -78,13 +79,13 @@ export default function Header() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchExpanded(true)}
                     onBlur={() => setIsSearchExpanded(false)}
-                    className="pr-20 rounded-full border-[var(--sage-green)] focus:ring-[var(--forest-green)]"
+                    className="pr-20 h-10 rounded-full border-[var(--sage-green)] focus:ring-[var(--forest-green)]"
                   />
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleVoiceSearch}
-                    className={`absolute right-10 h-8 w-8 p-0 rounded-full ${
+                    className={`absolute right-10 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 rounded-full ${
                       isListening ? "text-red-500 animate-pulse" : "text-[var(--sage-green)]"
                     }`}
                   >
@@ -94,7 +95,7 @@ export default function Header() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="absolute right-2 h-8 w-8 p-0 rounded-full text-[var(--sage-green)]"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 rounded-full text-[var(--sage-green)]"
                     >
                       <Search className="h-4 w-4" />
                     </Button>
