@@ -11,9 +11,10 @@ import type { Product } from "@shared/schema";
 interface ProductCardProps {
   product: Product;
   className?: string;
+  variant?: "grid" | "list";
 }
 
-export default function ProductCard({ product, className = "" }: ProductCardProps) {
+export default function ProductCard({ product, className = "", variant = "grid" }: ProductCardProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const { addToCart } = useCart();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -66,13 +67,15 @@ export default function ProductCard({ product, className = "" }: ProductCardProp
     ));
   };
 
+  const isListView = variant === "list";
+
   return (
-    <Card className={`product-card group cursor-pointer overflow-hidden bg-white shadow-lg ${className}`}>
-      <Link href={`/product/${product.id}`}>
-        <div className="relative">
-          <div className="aspect-square overflow-hidden">
+    <Card className={`product-card group cursor-pointer overflow-hidden bg-white shadow-lg ${isListView ? 'flex' : ''} ${className}`}>
+      <Link href={`/product/${product.id}`} className={isListView ? 'flex w-full' : ''}>
+        <div className={`relative ${isListView ? 'w-48 flex-shrink-0' : ''}`}>
+          <div className={`overflow-hidden ${isListView ? 'aspect-[4/3]' : 'aspect-square'}`}>
             <img
-              src={product.images[0] || "/placeholder-product.jpg"}
+              src={product.images && product.images[0] || "/placeholder-product.jpg"}
               alt={product.name}
               onLoad={() => setIsImageLoaded(true)}
               className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
@@ -102,7 +105,7 @@ export default function ProductCard({ product, className = "" }: ProductCardProp
           </Button>
 
           {/* Sustainability Score */}
-          {product.sustainabilityScore > 80 && (
+          {product.sustainabilityScore && product.sustainabilityScore > 80 && (
             <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-[var(--forest-green)]/90 text-white px-2 py-1 rounded-full text-xs">
               <Leaf className="h-3 w-3" />
               <span>{product.sustainabilityScore}% Eco</span>
@@ -110,68 +113,74 @@ export default function ProductCard({ product, className = "" }: ProductCardProp
           )}
         </div>
 
-        <CardContent className="p-6">
-          <div className="flex items-center gap-1 mb-2">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`h-4 w-4 ${
-                    star <= Math.floor(parseFloat(product.rating))
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-sm text-gray-600">({product.reviewCount})</span>
-          </div>
-
-          <h3 className="text-lg font-semibold mb-2 group-hover:text-[var(--forest-green)] transition-colors">
-            {product.name}
-          </h3>
-          
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {product.description}
-          </p>
-
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold text-[var(--forest-green)]">
-                ${product.price}
-              </span>
-              {product.stock < 10 && product.stock > 0 && (
-                <span className="text-xs text-orange-500">
-                  Only {product.stock} left
-                </span>
-              )}
-            </div>
-
-            <Button
-              onClick={handleAddToCart}
-              className="bg-[var(--forest-green)] hover:bg-[var(--dark-green)] text-white"
-            >
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              Add to Cart
-            </Button>
-          </div>
-
-          {/* Key Benefits */}
-          {product.benefits.length > 0 && (
-            <div className="mt-4 pt-4 border-t">
-              <div className="flex flex-wrap gap-1">
-                {product.benefits.slice(0, 3).map((benefit) => (
-                  <Badge
-                    key={benefit}
-                    variant="outline"
-                    className="text-xs text-[var(--forest-green)] border-[var(--sage-green)]"
-                  >
-                    {benefit}
-                  </Badge>
+        <CardContent className={`${isListView ? 'flex-1 p-6 flex flex-col justify-between' : 'p-6'}`}>
+          <div className={isListView ? 'space-y-3' : ''}>
+            <div className="flex items-center gap-1 mb-2">
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`h-4 w-4 ${
+                      star <= Math.floor(parseFloat(product.rating || '0'))
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
+                    }`}
+                  />
                 ))}
               </div>
+              <span className="text-sm text-gray-600">({product.reviewCount})</span>
             </div>
-          )}
+
+            <h3 className={`font-semibold mb-2 group-hover:text-[var(--forest-green)] transition-colors ${
+              isListView ? 'text-xl' : 'text-lg'
+            }`}>
+              {product.name}
+            </h3>
+            
+            <p className={`text-gray-600 text-sm mb-4 ${isListView ? 'line-clamp-3' : 'line-clamp-2'}`}>
+              {product.description}
+            </p>
+
+            <div className={`flex items-center ${isListView ? 'justify-between' : 'justify-between'}`}>
+              <div className="flex flex-col">
+                <span className={`font-bold text-[var(--forest-green)] ${isListView ? 'text-3xl' : 'text-2xl'}`}>
+                  ${product.price}
+                </span>
+                {product.stock && product.stock < 10 && product.stock > 0 && (
+                  <span className="text-xs text-orange-500">
+                    Only {product.stock} left
+                  </span>
+                )}
+              </div>
+
+              <Button
+                onClick={handleAddToCart}
+                className={`bg-[var(--forest-green)] hover:bg-[var(--dark-green)] text-white ${
+                  isListView ? 'px-6 py-2' : ''
+                }`}
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Add to Cart
+              </Button>
+            </div>
+
+            {/* Key Benefits */}
+            {product.benefits && product.benefits.length > 0 && (
+              <div className={`pt-4 border-t ${isListView ? 'mt-4' : 'mt-4'}`}>
+                <div className="flex flex-wrap gap-1">
+                  {product.benefits.slice(0, isListView ? 4 : 3).map((benefit) => (
+                    <Badge
+                      key={benefit}
+                      variant="outline"
+                      className="text-xs text-[var(--forest-green)] border-[var(--sage-green)]"
+                    >
+                      {benefit}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Link>
     </Card>

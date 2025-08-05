@@ -43,7 +43,7 @@ export default function Products() {
     // Skin type filter
     if (filters.skinTypes.length > 0) {
       const hasMatchingSkinType = filters.skinTypes.some(type => 
-        product.skinTypes.includes(type)
+        product.skinTypes && product.skinTypes.includes(type)
       );
       if (!hasMatchingSkinType) return false;
     }
@@ -51,7 +51,7 @@ export default function Products() {
     // Concerns filter
     if (filters.concerns.length > 0) {
       const hasMatchingConcern = filters.concerns.some(concern => 
-        product.concerns.includes(concern)
+        product.concerns && product.concerns.includes(concern)
       );
       if (!hasMatchingConcern) return false;
     }
@@ -92,9 +92,9 @@ export default function Products() {
       case "price-high":
         return parseFloat(b.price) - parseFloat(a.price);
       case "rating":
-        return parseFloat(b.rating) - parseFloat(a.rating);
+        return parseFloat(b.rating || '0') - parseFloat(a.rating || '0');
       case "newest":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0);
       case "featured":
       default:
         return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
@@ -334,7 +334,7 @@ export default function Products() {
                     <ProductCard 
                       key={product.id} 
                       product={product}
-                      className={viewMode === "list" ? "flex-row" : ""}
+                      variant={viewMode}
                     />
                   ))}
                 </div>
