@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -130,7 +130,7 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
         concerns: Array.isArray(answers.concerns) ? answers.concerns : [],
         sustainability: answers.sustainability || "",
         budget: answers.budget || "",
-        routineComplexity: answers.routine,
+        routineComplexity: answers.routineComplexity || "",
       };
       saveQuizMutation.mutate(quizData);
     } else {
@@ -169,6 +169,12 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
               <X className="h-4 w-4" />
             </Button>
           </div>
+          <DialogDescription className="sr-only">
+            {isResultsStep 
+              ? "View your personalized skincare product recommendations based on your quiz answers"
+              : "Complete a personalized quiz to discover the perfect skincare routine for your needs"
+            }
+          </DialogDescription>
         </DialogHeader>
 
         {/* Progress Bar */}

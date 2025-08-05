@@ -29,7 +29,7 @@ export default function ProductDetail() {
   });
 
   const { data: relatedProducts = [] } = useQuery<Product[]>({
-    queryKey: ["/api/products", { category: product?.category }],
+    queryKey: ["/api/products"],
     enabled: !!product?.category,
   });
 
@@ -142,7 +142,7 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Product Gallery */}
           <div>
-            <ProductGallery images={product.images} productName={product.name} />
+            <ProductGallery images={product.images || []} productName={product.name} />
           </div>
 
           {/* Product Info */}
@@ -170,7 +170,7 @@ export default function ProductDetail() {
                   <Star
                     key={star}
                     className={`h-5 w-5 ${
-                      star <= Math.floor(parseFloat(product.rating))
+                      star <= Math.floor(parseFloat(product.rating || '0'))
                         ? "text-yellow-400 fill-current"
                         : "text-gray-300"
                     }`}
@@ -196,7 +196,7 @@ export default function ProductDetail() {
             <p className="text-gray-700 leading-relaxed">{product.description}</p>
 
             {/* Key Benefits */}
-            {product.benefits.length > 0 && (
+            {product.benefits && product.benefits.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-2">Key Benefits:</h3>
                 <ul className="list-disc list-inside text-gray-700 space-y-1">
@@ -287,7 +287,7 @@ export default function ProductDetail() {
             </div>
 
             {/* Sustainability Score */}
-            {product.sustainabilityScore > 0 && (
+            {product.sustainabilityScore && product.sustainabilityScore > 0 && (
               <div className="bg-[var(--cream-beige)] rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Leaf className="h-5 w-5 text-[var(--forest-green)]" />
@@ -332,7 +332,7 @@ export default function ProductDetail() {
                         <div>
                           <h4 className="font-semibold mb-2">Suitable for:</h4>
                           <ul className="text-sm text-gray-600 space-y-1">
-                            {product.skinTypes.map((type) => (
+                            {product.skinTypes && product.skinTypes.map((type) => (
                               <li key={type}>{type} skin</li>
                             ))}
                           </ul>
@@ -340,7 +340,7 @@ export default function ProductDetail() {
                         <div>
                           <h4 className="font-semibold mb-2">Addresses:</h4>
                           <ul className="text-sm text-gray-600 space-y-1">
-                            {product.concerns.map((concern) => (
+                            {product.concerns && product.concerns.map((concern) => (
                               <li key={concern}>{concern}</li>
                             ))}
                           </ul>
@@ -383,7 +383,7 @@ export default function ProductDetail() {
               <div className="bg-white rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">All Ingredients</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {product.ingredients.map((ingredient) => (
+                  {product.ingredients && product.ingredients.map((ingredient) => (
                     <div key={ingredient} className="flex items-center gap-2 p-2 border rounded">
                       <Leaf className="h-4 w-4 text-[var(--forest-green)]" />
                       <span className="text-sm">{ingredient}</span>

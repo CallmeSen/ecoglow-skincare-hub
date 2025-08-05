@@ -15,16 +15,16 @@ export default function Blog() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { data: blogPosts = [], isLoading: postsLoading } = useQuery({
+  const { data: blogPosts = [], isLoading: postsLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
   });
 
-  const { data: currentPost, isLoading: postLoading } = useQuery({
+  const { data: currentPost, isLoading: postLoading } = useQuery<BlogPost>({
     queryKey: ["/api/blog", slug],
     enabled: !!slug,
   });
 
-  const { data: relatedProducts = [] } = useQuery({
+  const { data: relatedProducts = [] } = useQuery<Product[]>({
     queryKey: ["/api/products"],
     enabled: !!currentPost?.productIds?.length,
   });
@@ -107,7 +107,7 @@ export default function Blog() {
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>{new Date(currentPost.createdAt).toLocaleDateString()}</span>
+                    <span>{currentPost.createdAt ? new Date(currentPost.createdAt).toLocaleDateString() : 'Unknown date'}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
@@ -168,7 +168,7 @@ export default function Blog() {
                   <Tag className="h-4 w-4 text-gray-400" />
                   <div className="flex gap-2">
                     <Badge variant="outline">{currentPost.category}</Badge>
-                    {currentPost.productIds?.length > 0 && (
+                    {currentPost.productIds && currentPost.productIds.length > 0 && (
                       <Badge variant="outline">Product Guide</Badge>
                     )}
                   </div>
@@ -180,7 +180,7 @@ export default function Blog() {
                     if (navigator.share) {
                       navigator.share({
                         title: currentPost.title,
-                        text: currentPost.excerpt,
+                        text: currentPost.excerpt || '',
                         url: window.location.href,
                       });
                     }
@@ -288,7 +288,7 @@ export default function Blog() {
                           
                           <div className="flex items-center justify-between mt-auto">
                             <span className="text-sm text-gray-500">
-                              {new Date(post.createdAt).toLocaleDateString()}
+                              {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Unknown date'}
                             </span>
                             <span className="text-[var(--forest-green)] font-semibold hover:text-[var(--dark-green)]">
                               Read More →
@@ -352,7 +352,7 @@ export default function Blog() {
                         
                         <div className="flex items-center justify-between mt-auto">
                           <span className="text-sm text-gray-500">
-                            {new Date(post.createdAt).toLocaleDateString()}
+                            {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Unknown date'}
                           </span>
                           <span className="text-[var(--forest-green)] font-semibold hover:text-[var(--dark-green)]">
                             Read More →

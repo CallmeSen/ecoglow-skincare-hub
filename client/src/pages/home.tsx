@@ -14,16 +14,16 @@ export default function Home() {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [email, setEmail] = useState("");
 
-  const { data: featuredProducts = [], isLoading: productsLoading } = useQuery({
-    queryKey: ["/api/products", { featured: true }],
+  const { data: featuredProducts = [], isLoading: productsLoading } = useQuery<Product[]>({
+    queryKey: ["/api/products?featured=true"],
   });
 
-  const { data: trendingProducts = [], isLoading: trendingLoading } = useQuery({
-    queryKey: ["/api/products", { trending: true }],
+  const { data: trendingProducts = [], isLoading: trendingLoading } = useQuery<Product[]>({
+    queryKey: ["/api/products?trending=true"],
   });
 
-  const { data: blogPosts = [], isLoading: blogLoading } = useQuery({
-    queryKey: ["/api/blog", { featured: true }],
+  const { data: blogPosts = [], isLoading: blogLoading } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog?featured=true"],
   });
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {

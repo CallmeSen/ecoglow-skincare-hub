@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Camera, RotateCcw, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
@@ -192,6 +192,9 @@ export default function ARTryOn({ isOpen, onClose, product }: ARTryOnProps) {
               <X className="h-4 w-4" />
             </Button>
           </div>
+          <DialogDescription className="sr-only">
+            Try on {product.name} virtually using your camera with adjustable shade and intensity controls
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
