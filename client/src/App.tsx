@@ -11,6 +11,7 @@ import Quiz from "@/pages/quiz";
 import Sustainability from "@/pages/sustainability";
 import Blog from "@/pages/blog";
 import Cart from "@/pages/cart";
+import Checkout from "@/pages/checkout";
 import Account from "@/pages/account";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -32,6 +33,7 @@ function Router() {
           <Route path="/blog" component={Blog} />
           <Route path="/blog/:slug" component={Blog} />
           <Route path="/cart" component={Cart} />
+          <Route path="/checkout" component={Checkout} />
           <Route path="/account" component={Account} />
           <Route component={NotFound} />
         </Switch>

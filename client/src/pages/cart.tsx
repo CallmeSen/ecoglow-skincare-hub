@@ -326,13 +326,16 @@ export default function Cart() {
                 </div>
 
                 {/* Checkout Button */}
-                <Button
-                  size="lg"
-                  className="w-full bg-[var(--berry-red)] hover:bg-red-700 text-white"
-                >
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  Proceed to Checkout
-                </Button>
+                <Link href="/checkout">
+                  <Button
+                    size="lg"
+                    className="w-full bg-[var(--berry-red)] hover:bg-red-700 text-white"
+                    data-testid="button-checkout"
+                  >
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    Proceed to Checkout
+                  </Button>
+                </Link>
 
                 {/* Security Notice */}
                 <div className="text-center text-sm text-gray-500">
