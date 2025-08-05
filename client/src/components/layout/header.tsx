@@ -90,13 +90,15 @@ export default function Header() {
                   >
                     <Mic className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 h-8 w-8 p-0 rounded-full text-[var(--sage-green)]"
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
+                  <Link href="/search">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 h-8 w-8 p-0 rounded-full text-[var(--sage-green)]"
+                    >
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
 

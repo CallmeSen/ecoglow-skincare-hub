@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Products from "@/pages/products";
 import ProductDetail from "@/pages/product-detail";
+import Search from "@/pages/search";
 import Quiz from "@/pages/quiz";
 import Sustainability from "@/pages/sustainability";
 import Blog from "@/pages/blog";
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/products" component={Products} />
           <Route path="/products/:category" component={Products} />
           <Route path="/product/:id" component={ProductDetail} />
+          <Route path="/search" component={Search} />
           <Route path="/quiz" component={Quiz} />
           <Route path="/sustainability" component={Sustainability} />
           <Route path="/blog" component={Blog} />
