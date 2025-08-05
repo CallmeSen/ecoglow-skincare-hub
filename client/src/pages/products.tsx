@@ -340,17 +340,56 @@ export default function Products() {
                 </div>
               </>
             ) : (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <Search className="h-12 w-12 text-gray-400" />
+              /* No Products Found State */
+              <div className="text-center py-16">
+                <div className="w-64 h-64 mx-auto mb-8 bg-[var(--cream-beige)] rounded-full flex items-center justify-center">
+                  <div className="text-6xl">🍃</div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">No products found</h3>
-                <p className="text-gray-600 mb-4">
-                  Try adjusting your filters or search terms to find what you're looking for.
+                <h3 className="text-2xl font-semibold mb-4">
+                  {searchQuery ? `No Matches for "${searchQuery}"` : "No Products Found"}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {searchQuery 
+                    ? "Try adjusting your search terms or filters to find what you're looking for"
+                    : "Try adjusting your filters or browse our featured collections"
+                  }
                 </p>
-                <Button onClick={clearFilters} variant="outline">
-                  Clear Filters
-                </Button>
+                
+                {/* Suggested Actions */}
+                <div className="mb-8 space-y-4">
+                  <Button 
+                    onClick={clearFilters} 
+                    variant="outline"
+                    className="mr-4"
+                  >
+                    Clear All Filters
+                  </Button>
+                  {searchQuery && (
+                    <Button 
+                      onClick={() => setSearchQuery("")}
+                      variant="outline"
+                    >
+                      Clear Search
+                    </Button>
+                  )}
+                </div>
+
+                {/* Popular Categories */}
+                <div className="mb-8">
+                  <h4 className="font-medium mb-4">Popular Categories:</h4>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {Object.entries(PRODUCT_CATEGORIES).slice(0, 5).map(([key, label]) => (
+                      <Button
+                        key={key}
+                        variant="ghost"
+                        onClick={() => window.location.href = `/products/${key}`}
+                        className="bg-[var(--sage-green)] text-white px-4 py-2 rounded-full hover:bg-[var(--forest-green)] transition-colors"
+                      >
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>
