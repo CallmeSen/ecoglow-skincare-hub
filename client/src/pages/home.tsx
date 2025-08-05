@@ -63,7 +63,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white hover:bg-white hover:text-[var(--forest-green)] text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all"
+                className="border-2 border-white bg-white text-[var(--forest-green)] hover:bg-[var(--forest-green)] hover:text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all"
               >
                 Shop Trending Products
               </Button>

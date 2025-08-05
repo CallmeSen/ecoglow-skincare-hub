@@ -201,23 +201,25 @@ export default function Checkout() {
 
   const placeOrderMutation = useMutation({
     mutationFn: async () => {
+      const subtotal = calculateSubtotal();
+      const shipping = calculateShipping();
+      const total = calculateTotal();
+      const carbonOffset = calculateCarbonOffset();
+      
       const orderData = {
+        userId: "demo-user",
         items: cartItemsWithProducts.map(item => ({
           productId: item.productId,
           quantity: item.quantity || 1,
           price: item.product!.price
         })),
-        shipping: formData.shipping,
-        payment: { last4: formData.payment.cardNumber.slice(-4) },
-        totals: {
-          subtotal: calculateSubtotal(),
-          tax: calculateTax(calculateSubtotal()),
-          shipping: calculateShipping(),
-          ecoFees: calculateEcoFees(),
-          total: calculateTotal()
-        },
-        ecoOptions: formData.ecoOptions,
-        carbonOffset: calculateCarbonOffset()
+        subtotal: subtotal.toString(),
+        shipping: shipping.toString(),
+        total: total.toString(),
+        shippingType: formData.shipping.shippingMethod,
+        carbonOffset: carbonOffset.toString(),
+        treesPlanted: formData.ecoOptions.carbonOffset ? 2 : 1,
+        status: "pending"
       };
 
       const response = await apiRequest("POST", "/api/orders", orderData);
