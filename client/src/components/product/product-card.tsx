@@ -24,7 +24,16 @@ export default function ProductCard({ product, className = "", variant = "grid" 
     e.preventDefault();
     e.stopPropagation();
     try {
+      // Add cart fly animation
+      const button = e.currentTarget as HTMLElement;
+      button.classList.add('cart-fly');
+      
       await addToCart(product.id);
+      
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        button.classList.remove('cart-fly');
+      }, 600);
     } catch (error) {
       console.error("Failed to add to cart:", error);
     }
@@ -34,6 +43,16 @@ export default function ProductCard({ product, className = "", variant = "grid" 
     e.preventDefault();
     e.stopPropagation();
     try {
+      // Add pulse animation
+      const button = e.currentTarget as HTMLElement;
+      const heartIcon = button.querySelector('.heart-icon') as HTMLElement;
+      if (heartIcon) {
+        heartIcon.classList.add('pulse-heart');
+        setTimeout(() => {
+          heartIcon.classList.remove('pulse-heart');
+        }, 2000);
+      }
+
       if (isWishlisted) {
         await removeFromWishlist(product.id);
       } else {
@@ -70,7 +89,7 @@ export default function ProductCard({ product, className = "", variant = "grid" 
   const isListView = variant === "list";
 
   return (
-    <Card className={`product-card group cursor-pointer overflow-hidden bg-white shadow-lg ${isListView ? 'flex' : ''} ${className}`}>
+    <Card className={`product-card group cursor-pointer overflow-hidden bg-white shadow-lg hover-glow ${isListView ? 'flex' : ''} ${className} fade-in`}>
       <Link href={`/product/${product.id}`} className={isListView ? 'flex w-full' : ''}>
         <div className={`relative ${isListView ? 'w-48 flex-shrink-0' : ''}`}>
           <div className={`overflow-hidden ${isListView ? 'aspect-[4/3]' : 'aspect-square'}`}>
@@ -101,7 +120,7 @@ export default function ProductCard({ product, className = "", variant = "grid" 
               isWishlisted ? "text-red-500" : "text-gray-600"
             }`}
           >
-            <Heart className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`} />
+            <Heart className={`h-4 w-4 heart-icon ${isWishlisted ? "fill-current" : ""}`} />
           </Button>
 
           {/* Sustainability Score */}
@@ -155,7 +174,7 @@ export default function ProductCard({ product, className = "", variant = "grid" 
 
               <Button
                 onClick={handleAddToCart}
-                className={`bg-[var(--forest-green)] hover:bg-[var(--dark-green)] text-white ${
+                className={`bg-[var(--forest-green)] hover:bg-[var(--dark-green)] text-white micro-bounce ${
                   isListView ? 'px-6 py-2' : ''
                 }`}
               >

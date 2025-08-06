@@ -379,7 +379,7 @@ export default function Sustainability() {
               </Button>
             </Link>
             <Link href="/quiz">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[var(--forest-green)]">
+              <Button size="lg" variant="outline" className="border-white text-[var(--forest-green)] hover:bg-white hover:text-[var(--forest-green)]">
                 Find Your Perfect Match
               </Button>
             </Link>

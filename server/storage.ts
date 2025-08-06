@@ -1,4 +1,18 @@
-import { type Product, type InsertProduct, type User, type InsertUser, type CartItem, type InsertCartItem, type WishlistItem, type InsertWishlistItem, type Order, type InsertOrder, type BlogPost, type InsertBlogPost, type QuizResponse, type InsertQuizResponse } from "@shared/schema";
+import { 
+  type Product, type InsertProduct,
+  type User, type InsertUser,
+  type CartItem, type InsertCartItem,
+  type WishlistItem, type InsertWishlistItem,
+  type Order, type InsertOrder,
+  type BlogPost, type InsertBlogPost,
+  type QuizResponse, type InsertQuizResponse,
+  type Category, type InsertCategory,
+  type Supplier, type InsertSupplier,
+  type Review, type InsertReview,
+  type CarbonFootprint, type InsertCarbonFootprint,
+  type InventoryLog, type InsertInventoryLog,
+  type AuditLog, type InsertAuditLog
+} from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -7,30 +21,35 @@ export interface IStorage {
   getProduct(id: string): Promise<Product | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product | undefined>;
+  deleteProduct(id: string): Promise<boolean>;
   searchProducts(query: string): Promise<Product[]>;
+  getProductsByCategory(category: string): Promise<Product[]>;
 
   // User operations
+  getUsers(): Promise<User[]>;
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
 
   // Cart operations
   getCartItems(userId: string): Promise<CartItem[]>;
   addToCart(item: InsertCartItem): Promise<CartItem>;
   updateCartItem(id: string, quantity: number): Promise<CartItem | undefined>;
-  removeFromCart(id: string): Promise<boolean>;
+  removeFromCart(userId: string, productId: string): Promise<boolean>;
   clearCart(userId: string): Promise<boolean>;
 
   // Wishlist operations
   getWishlistItems(userId: string): Promise<WishlistItem[]>;
   addToWishlist(item: InsertWishlistItem): Promise<WishlistItem>;
-  removeFromWishlist(id: string): Promise<boolean>;
+  removeFromWishlist(userId: string, productId: string): Promise<boolean>;
 
   // Order operations
-  createOrder(order: InsertOrder): Promise<Order>;
-  getOrders(userId: string): Promise<Order[]>;
+  getOrders(): Promise<Order[]>;
   getOrder(id: string): Promise<Order | undefined>;
+  getOrdersByUser(userId: string): Promise<Order[]>;
+  createOrder(order: InsertOrder): Promise<Order>;
 
   // Blog operations
   getBlogPosts(filters?: { category?: string; featured?: boolean }): Promise<BlogPost[]>;
@@ -38,8 +57,11 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
 
   // Quiz operations
-  saveQuizResponse(response: InsertQuizResponse): Promise<QuizResponse>;
+  createQuizResponse(response: InsertQuizResponse): Promise<QuizResponse>;
   getQuizResponse(userId: string): Promise<QuizResponse | undefined>;
+
+  // Sustainability operations
+  getSustainabilityStats(): Promise<{ treesPlanted: number; co2Offset: string }>;
 }
 
 export class MemStorage implements IStorage {
@@ -70,13 +92,28 @@ export class MemStorage implements IStorage {
         name: "Bakuchiol Glow Serum",
         description: "Our bestselling bakuchiol serum offers gentle anti-aging benefits without irritation. Derived from Psoralea corylifolia, this plant-based powerhouse reduces fine lines by up to 20% in clinical studies while being 100% vegan and cruelty-free.",
         price: "28.00",
+        cost: "10.00",
+        sku: "BK-SER-001",
         category: "serums",
         subcategory: "anti-aging",
+        categoryId: null,
+        supplierId: null,
         images: ["https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"],
-        ingredients: ["Bakuchiol 1%", "Hyaluronic Acid", "Vitamin E", "Jojoba Oil", "Rose Hip Oil"],
+        ingredients: [
+          { name: "Bakuchiol", percentage: 1, source: "plant-derived" },
+          { name: "Hyaluronic Acid", percentage: 2, source: "synthetic" },
+          { name: "Vitamin E", percentage: 0.5, source: "natural" },
+          { name: "Jojoba Oil", percentage: 10, source: "plant-derived" },
+          { name: "Rose Hip Oil", percentage: 5, source: "plant-derived" }
+        ],
         benefits: ["Reduces fine lines", "Improves skin elasticity", "Gentle on sensitive skin", "Antioxidant protection"],
         skinTypes: ["dry", "combination", "sensitive"],
         concerns: ["aging", "hydration"],
+        sustainabilityMetrics: {
+          co2PerUnit: 0.5,
+          recycledPackaging: true,
+          offsetProgram: "Ecologi"
+        },
         sustainabilityScore: 95,
         isVegan: true,
         isCrueltyFree: true,
@@ -95,13 +132,28 @@ export class MemStorage implements IStorage {
         name: "Beet Tinted Balm",
         description: "Multi-use vegan color made from natural beet extracts. This nourishing balm provides buildable color while moisturizing your lips with organic ingredients.",
         price: "15.00",
+        cost: "6.00",
+        sku: "BT-BAL-002",
         category: "makeup",
         subcategory: "lips",
+        categoryId: null,
+        supplierId: null,
         images: ["https://images.unsplash.com/photo-1586495777744-4413f21062fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"],
-        ingredients: ["Beet Extract", "Coconut Oil", "Shea Butter", "Carnauba Wax", "Vitamin E"],
+        ingredients: [
+          { name: "Beet Extract", percentage: 15, source: "plant-derived" },
+          { name: "Coconut Oil", percentage: 20, source: "plant-derived" },
+          { name: "Shea Butter", percentage: 25, source: "plant-derived" },
+          { name: "Carnauba Wax", percentage: 5, source: "plant-derived" },
+          { name: "Vitamin E", percentage: 0.5, source: "natural" }
+        ],
         benefits: ["Natural color", "Moisturizing", "Long-lasting", "Buildable coverage"],
         skinTypes: ["all"],
         concerns: ["hydration"],
+        sustainabilityMetrics: {
+          co2PerUnit: 0.3,
+          recycledPackaging: true,
+          offsetProgram: "One Tree Planted"
+        },
         sustainabilityScore: 90,
         isVegan: true,
         isCrueltyFree: true,
@@ -120,13 +172,28 @@ export class MemStorage implements IStorage {
         name: "Complete Glow Kit",
         description: "5-piece sustainable routine with customizable options. Includes cleanser, toner, serum, moisturizer, and mask in eco-friendly packaging.",
         price: "65.00",
+        cost: "25.00",
+        sku: "CG-KIT-003",
         category: "kits",
         subcategory: "skincare",
+        categoryId: null,
+        supplierId: null,
         images: ["https://images.unsplash.com/photo-1556228720-195a672e8a03?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"],
-        ingredients: ["Bakuchiol", "Hyaluronic Acid", "Plant Ceramides", "Green Tea Extract", "Niacinamide"],
+        ingredients: [
+          { name: "Bakuchiol", percentage: 1, source: "plant-derived" },
+          { name: "Hyaluronic Acid", percentage: 2, source: "synthetic" },
+          { name: "Plant Ceramides", percentage: 3, source: "plant-derived" },
+          { name: "Green Tea Extract", percentage: 5, source: "plant-derived" },
+          { name: "Niacinamide", percentage: 5, source: "synthetic" }
+        ],
         benefits: ["Complete routine", "Eco-friendly packaging", "Customizable", "15% savings"],
         skinTypes: ["all"],
         concerns: ["aging", "hydration", "acne"],
+        sustainabilityMetrics: {
+          co2PerUnit: 1.2,
+          recycledPackaging: true,
+          offsetProgram: "TreeApp"
+        },
         sustainabilityScore: 98,
         isVegan: true,
         isCrueltyFree: true,
@@ -145,13 +212,28 @@ export class MemStorage implements IStorage {
         name: "Beet Glow Gummies",
         description: "Internal radiance supplement with 500mg beet extract for natural glow and detoxification. Comes in compostable packaging.",
         price: "22.00",
+        cost: "8.00",
+        sku: "BG-GUM-004",
         category: "supplements",
         subcategory: "gummies",
+        categoryId: null,
+        supplierId: null,
         images: ["https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"],
-        ingredients: ["Beet Extract 500mg", "Vitamin C", "Biotin", "Zinc", "Natural Berry Flavor"],
+        ingredients: [
+          { name: "Beet Extract", percentage: 25, source: "plant-derived" },
+          { name: "Vitamin C", percentage: 5, source: "synthetic" },
+          { name: "Biotin", percentage: 0.1, source: "synthetic" },
+          { name: "Zinc", percentage: 1, source: "mineral" },
+          { name: "Natural Berry Flavor", percentage: 2, source: "natural" }
+        ],
         benefits: ["Internal glow", "Detoxification", "Antioxidant support", "Skin health"],
         skinTypes: ["all"],
         concerns: ["dullness", "detox"],
+        sustainabilityMetrics: {
+          co2PerUnit: 0.8,
+          recycledPackaging: false,
+          offsetProgram: "Cool Effect"
+        },
         sustainabilityScore: 85,
         isVegan: true,
         isCrueltyFree: true,
@@ -242,13 +324,40 @@ export class MemStorage implements IStorage {
   async createProduct(product: InsertProduct): Promise<Product> {
     const id = randomUUID();
     const newProduct: Product = {
-      ...product,
       id,
-      concerns: product.concerns || [],
-      ingredients: product.ingredients || [],
-      benefits: product.benefits || [],
-      skinTypes: product.skinTypes || [],
-      images: product.images || [],
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      cost: product.cost,
+      sku: product.sku,
+      category: product.category,
+      subcategory: product.subcategory || null,
+      categoryId: product.categoryId || null,
+      supplierId: product.supplierId || null,
+      images: product.images ? [...product.images] : [],
+      ingredients: product.ingredients ? product.ingredients.map((ing: any) => ({
+        name: ing.name,
+        percentage: typeof ing.percentage === 'number' ? ing.percentage : undefined,
+        source: typeof ing.source === 'string' ? ing.source : undefined
+      })) : [],
+      benefits: product.benefits ? [...product.benefits] : [],
+      skinTypes: product.skinTypes ? [...product.skinTypes] : [],
+      concerns: product.concerns ? [...product.concerns] : [],
+      sustainabilityMetrics: product.sustainabilityMetrics ? {
+        co2PerUnit: typeof product.sustainabilityMetrics.co2PerUnit === 'number' ? product.sustainabilityMetrics.co2PerUnit : undefined,
+        recycledPackaging: typeof product.sustainabilityMetrics.recycledPackaging === 'boolean' ? product.sustainabilityMetrics.recycledPackaging : undefined,
+        offsetProgram: typeof product.sustainabilityMetrics.offsetProgram === 'string' ? product.sustainabilityMetrics.offsetProgram : undefined
+      } : {},
+      sustainabilityScore: product.sustainabilityScore || 0,
+      isVegan: product.isVegan || false,
+      isCrueltyFree: product.isCrueltyFree || false,
+      isOrganic: product.isOrganic || false,
+      carbonFootprint: product.carbonFootprint || "0",
+      stock: product.stock || 0,
+      rating: product.rating || "0",
+      reviewCount: product.reviewCount || 0,
+      featured: product.featured || false,
+      trending: product.trending || false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -263,11 +372,20 @@ export class MemStorage implements IStorage {
     const updated = { 
       ...existing, 
       ...product,
-      concerns: product.concerns || existing.concerns,
-      ingredients: product.ingredients || existing.ingredients,
-      benefits: product.benefits || existing.benefits,
-      skinTypes: product.skinTypes || existing.skinTypes,
-      images: product.images || existing.images,
+      concerns: product.concerns ? [...product.concerns] : existing.concerns,
+      ingredients: product.ingredients ? product.ingredients.map((ing: any) => ({
+        name: ing.name,
+        percentage: typeof ing.percentage === 'number' ? ing.percentage : undefined,
+        source: typeof ing.source === 'string' ? ing.source : undefined
+      })) : existing.ingredients,
+      sustainabilityMetrics: product.sustainabilityMetrics ? {
+        co2PerUnit: typeof product.sustainabilityMetrics.co2PerUnit === 'number' ? product.sustainabilityMetrics.co2PerUnit : undefined,
+        recycledPackaging: typeof product.sustainabilityMetrics.recycledPackaging === 'boolean' ? product.sustainabilityMetrics.recycledPackaging : undefined,
+        offsetProgram: typeof product.sustainabilityMetrics.offsetProgram === 'string' ? product.sustainabilityMetrics.offsetProgram : undefined
+      } : existing.sustainabilityMetrics,
+      benefits: product.benefits ? [...product.benefits] : existing.benefits,
+      skinTypes: product.skinTypes ? [...product.skinTypes] : existing.skinTypes,
+      images: product.images ? [...product.images] : existing.images,
       updatedAt: new Date() 
     };
     this.products.set(id, updated);
@@ -280,7 +398,7 @@ export class MemStorage implements IStorage {
       product.name.toLowerCase().includes(lowercaseQuery) ||
       product.description.toLowerCase().includes(lowercaseQuery) ||
       product.category.toLowerCase().includes(lowercaseQuery) ||
-      (product.ingredients && product.ingredients.some(ing => ing.toLowerCase().includes(lowercaseQuery)))
+      (product.ingredients && product.ingredients.some(ing => ing.name.toLowerCase().includes(lowercaseQuery)))
     );
   }
 
@@ -296,11 +414,35 @@ export class MemStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     const id = randomUUID();
     const newUser: User = {
-      ...user,
       id,
-      skinConcerns: user.skinConcerns || [],
+      email: user.email || null,
+      passwordHash: user.passwordHash || null,
+      firstName: user.firstName || null,
+      lastName: user.lastName || null,
+      profileImageUrl: user.profileImageUrl || null,
+      skinType: user.skinType || null,
+      skinConcerns: user.skinConcerns ? [...user.skinConcerns] : [],
+      preferences: user.preferences || {},
+      address: user.address ? {
+        street: typeof user.address.street === 'string' ? user.address.street : undefined,
+        city: typeof user.address.city === 'string' ? user.address.city : undefined,
+        zip: typeof user.address.zip === 'string' ? user.address.zip : undefined,
+        country: typeof user.address.country === 'string' ? user.address.country : undefined
+      } : {},
+      sustainabilityPreference: user.sustainabilityPreference || null,
+      budget: user.budget || null,
+      loyaltyPoints: user.loyaltyPoints || 0,
+      treesPlanted: user.treesPlanted || 0,
+      co2Offset: user.co2Offset || "0",
+      role: user.role || "user",
+      consentFlags: user.consentFlags ? {
+        gdprConsent: typeof user.consentFlags.gdprConsent === 'boolean' ? user.consentFlags.gdprConsent : undefined,
+        marketingConsent: typeof user.consentFlags.marketingConsent === 'boolean' ? user.consentFlags.marketingConsent : undefined,
+        dataExportRequested: typeof user.consentFlags.dataExportRequested === 'boolean' ? user.consentFlags.dataExportRequested : undefined
+      } : {},
       createdAt: new Date(),
       updatedAt: new Date(),
+      lastLogin: null,
     };
     this.users.set(id, newUser);
     return newUser;
@@ -310,7 +452,24 @@ export class MemStorage implements IStorage {
     const existing = this.users.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...user, updatedAt: new Date() };
+    const updated = { 
+      ...existing, 
+      ...user, 
+      skinConcerns: user.skinConcerns ? [...user.skinConcerns] : existing.skinConcerns,
+      preferences: user.preferences || existing.preferences,
+      address: user.address ? {
+        street: typeof user.address.street === 'string' ? user.address.street : undefined,
+        city: typeof user.address.city === 'string' ? user.address.city : undefined,
+        zip: typeof user.address.zip === 'string' ? user.address.zip : undefined,
+        country: typeof user.address.country === 'string' ? user.address.country : undefined
+      } : existing.address,
+      consentFlags: user.consentFlags ? {
+        gdprConsent: typeof user.consentFlags.gdprConsent === 'boolean' ? user.consentFlags.gdprConsent : undefined,
+        marketingConsent: typeof user.consentFlags.marketingConsent === 'boolean' ? user.consentFlags.marketingConsent : undefined,
+        dataExportRequested: typeof user.consentFlags.dataExportRequested === 'boolean' ? user.consentFlags.dataExportRequested : undefined
+      } : existing.consentFlags,
+      updatedAt: new Date() 
+    };
     this.users.set(id, updated);
     return updated;
   }
@@ -323,8 +482,10 @@ export class MemStorage implements IStorage {
   async addToCart(item: InsertCartItem): Promise<CartItem> {
     const id = randomUUID();
     const newItem: CartItem = {
-      ...item,
       id,
+      userId: item.userId || null,
+      productId: item.productId,
+      quantity: item.quantity || 1,
       createdAt: new Date(),
     };
     this.cartItems.set(id, newItem);
@@ -340,8 +501,14 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
-  async removeFromCart(id: string): Promise<boolean> {
-    return this.cartItems.delete(id);
+  async removeFromCart(userId: string, productId: string): Promise<boolean> {
+    const item = Array.from(this.cartItems.values()).find(
+      item => item.userId === userId && item.productId === productId
+    );
+    if (item) {
+      return this.cartItems.delete(item.id);
+    }
+    return false;
   }
 
   async clearCart(userId: string): Promise<boolean> {
@@ -358,36 +525,62 @@ export class MemStorage implements IStorage {
   async addToWishlist(item: InsertWishlistItem): Promise<WishlistItem> {
     const id = randomUUID();
     const newItem: WishlistItem = {
-      ...item,
       id,
+      userId: item.userId || null,
+      productId: item.productId,
       createdAt: new Date(),
     };
     this.wishlistItems.set(id, newItem);
     return newItem;
   }
 
-  async removeFromWishlist(id: string): Promise<boolean> {
-    return this.wishlistItems.delete(id);
+  async removeFromWishlist(userId: string, productId: string): Promise<boolean> {
+    const item = Array.from(this.wishlistItems.values()).find(
+      item => item.userId === userId && item.productId === productId
+    );
+    if (item) {
+      return this.wishlistItems.delete(item.id);
+    }
+    return false;
   }
 
   // Order operations
-  async createOrder(order: InsertOrder): Promise<Order> {
-    const id = randomUUID();
-    const newOrder: Order = {
-      ...order,
-      id,
-      createdAt: new Date(),
-    };
-    this.orders.set(id, newOrder);
-    return newOrder;
-  }
-
-  async getOrders(userId: string): Promise<Order[]> {
-    return Array.from(this.orders.values()).filter(order => order.userId === userId);
+  async getOrders(): Promise<Order[]> {
+    return Array.from(this.orders.values());
   }
 
   async getOrder(id: string): Promise<Order | undefined> {
     return this.orders.get(id);
+  }
+
+  async getOrdersByUser(userId: string): Promise<Order[]> {
+    return Array.from(this.orders.values()).filter(order => order.userId === userId);
+  }
+
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const id = randomUUID();
+    const newOrder: Order = {
+      id,
+      userId: order.userId || null,
+      subtotal: order.subtotal,
+      shipping: order.shipping || "0",
+      total: order.total,
+      shippingAddress: order.shippingAddress ? {
+        street: typeof order.shippingAddress.street === 'string' ? order.shippingAddress.street : undefined,
+        city: typeof order.shippingAddress.city === 'string' ? order.shippingAddress.city : undefined,
+        zip: typeof order.shippingAddress.zip === 'string' ? order.shippingAddress.zip : undefined,
+        country: typeof order.shippingAddress.country === 'string' ? order.shippingAddress.country : undefined
+      } : {},
+      paymentMethod: order.paymentMethod || "stripe",
+      paymentStatus: order.paymentStatus || "pending",
+      shippingType: order.shippingType || "standard",
+      carbonOffset: order.carbonOffset || "0",
+      treesPlanted: order.treesPlanted || 0,
+      status: order.status || "pending",
+      createdAt: new Date(),
+    };
+    this.orders.set(id, newOrder);
+    return newOrder;
   }
 
   // Blog operations
@@ -401,7 +594,7 @@ export class MemStorage implements IStorage {
       posts = posts.filter(p => p.featured === filters.featured);
     }
     
-    return posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return posts.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
   async getBlogPost(slug: string): Promise<BlogPost | undefined> {
@@ -411,8 +604,16 @@ export class MemStorage implements IStorage {
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
     const id = randomUUID();
     const newPost: BlogPost = {
-      ...post,
       id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt || null,
+      content: post.content,
+      featuredImage: post.featuredImage || null,
+      category: post.category,
+      readTime: post.readTime || 5,
+      featured: post.featured || false,
+      productIds: post.productIds ? [...post.productIds] : [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -421,11 +622,13 @@ export class MemStorage implements IStorage {
   }
 
   // Quiz operations
-  async saveQuizResponse(response: InsertQuizResponse): Promise<QuizResponse> {
+  async createQuizResponse(response: InsertQuizResponse): Promise<QuizResponse> {
     const id = randomUUID();
     const newResponse: QuizResponse = {
-      ...response,
       id,
+      userId: response.userId || null,
+      responses: response.responses,
+      recommendations: response.recommendations ? [...response.recommendations] : [],
       createdAt: new Date(),
     };
     this.quizResponses.set(id, newResponse);
@@ -434,6 +637,33 @@ export class MemStorage implements IStorage {
 
   async getQuizResponse(userId: string): Promise<QuizResponse | undefined> {
     return Array.from(this.quizResponses.values()).find(response => response.userId === userId);
+  }
+
+  // Additional methods for enhanced interface
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    return this.products.delete(id);
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    return this.users.delete(id);
+  }
+
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    return Array.from(this.products.values()).filter(product => product.category === category);
+  }
+
+  async getSustainabilityStats(): Promise<{ treesPlanted: number; co2Offset: string }> {
+    const users = Array.from(this.users.values());
+    const treesPlanted = users.reduce((sum, user) => sum + (user.treesPlanted || 0), 0);
+    const co2Offset = users.reduce((sum, user) => sum + parseFloat(user.co2Offset || "0"), 0);
+    return {
+      treesPlanted,
+      co2Offset: co2Offset.toString()
+    };
   }
 }
 

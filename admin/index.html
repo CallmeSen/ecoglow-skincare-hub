@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoGlow Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .eco-green { color: #228B22; }
+        .eco-bg-green { background-color: #228B22; }
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+        .table-row:hover { background-color: #f0f9ff; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="admin-app"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Sidebar Navigation Component
+        const Sidebar = ({ isOpen, toggleSidebar }) => {
+            const [activeSection, setActiveSection] = useState('dashboard');
+            
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-chart-line', children: [] },
+                { 
+                    id: 'products', 
+                    label: 'Products', 
+                    icon: 'fas fa-leaf', 
+                    children: [
+                        { id: 'all-products', label: 'All Products' },
+                        { id: 'add-product', label: 'Add Product' },
+                        { id: 'categories', label: 'Categories' },
+                        { id: 'suppliers', label: 'Suppliers' }
+                    ]
+                },
+                { 
+                    id: 'orders', 
+                    label: 'Orders', 
+                    icon: 'fas fa-shopping-cart', 
+                    children: [
+                        { id: 'all-orders', label: 'All Orders' },
+                        { id: 'pending', label: 'Pending' },
+                        { id: 'shipped', label: 'Shipped' },
+                        { id: 'completed', label: 'Completed' }
+                    ]
+                },
+                { 
+                    id: 'users', 
+                    label: 'Users', 
+                    icon: 'fas fa-users', 
+                    children: [
+                        { id: 'all-users', label: 'All Users' },
+                        { id: 'quiz-responses', label: 'Quiz Responses' },
+                        { id: 'user-analytics', label: 'User Analytics' }
+                    ]
+                },
+                { 
+                    id: 'ai-personalization', 
+                    label: 'AI & Personalization', 
+                    icon: 'fas fa-brain', 
+                    children: [
+                        { id: 'quiz-builder', label: 'Quiz Builder' },
+                        { id: 'recommendations', label: 'Recommendations' },
+                        { id: 'ai-analytics', label: 'AI Analytics' }
+                    ]
+                },
+                { 
+                    id: 'ar-integration', 
+                    label: 'AR Integration', 
+                    icon: 'fas fa-camera', 
+                    children: [
+                        { id: 'ar-models', label: '3D Models' },
+                        { id: 'ar-analytics', label: 'AR Analytics' },
+                        { id: 'ar-settings', label: 'AR Settings' }
+                    ]
+                },
+                { 
+                    id: 'sustainability', 
+                    label: 'Sustainability Tools', 
+                    icon: 'fas fa-seedling', 
+                    children: [
+                        { id: 'carbon-calculator', label: 'Carbon Calculator' },
+                        { id: 'eco-badges', label: 'Eco Badges' },
+                        { id: 'sustainability-reports', label: 'Reports' }
+                    ]
+                },
+                { 
+                    id: 'content', 
+                    label: 'Content Management', 
+                    icon: 'fas fa-edit', 
+                    children: [
+                        { id: 'parallax-stories', label: 'Parallax Stories' },
+                        { id: 'blog-posts', label: 'Blog Posts' },
+                        { id: 'voice-search', label: 'Voice Search Optimization' }
+                    ]
+                },
+                { 
+                    id: 'analytics', 
+                    label: 'Analytics', 
+                    icon: 'fas fa-chart-bar', 
+                    children: [
+                        { id: 'sales-analytics', label: 'Sales Analytics' },
+                        { id: 'conversion-tracking', label: 'Conversion Tracking' },
+                        { id: 'sustainability-metrics', label: 'Sustainability Metrics' }
+                    ]
+                },
+                { id: 'settings', label: 'Settings', icon: 'fas fa-cog', children: [] }
+            ];
+
+            return (
+                <nav className={`fixed left-0 top-0 h-full eco-bg-green text-white w-64 sidebar-transition transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-30`}>
+                    <div className="p-4 border-b border-green-700">
+                        <div className="flex items-center">
+                            <i className="fas fa-leaf text-2xl mr-3"></i>
+                            <h1 className="text-xl font-bold">EcoGlow Admin</h1>
+                        </div>
+                    </div>
+                    <div className="overflow-y-auto h-full pb-20">
+                        {menuItems.map(item => (
+                            <div key={item.id} className="mb-1">
+                                <div 
+                                    className={`px-4 py-3 hover:bg-green-700 cursor-pointer flex items-center justify-between ${activeSection === item.id ? 'bg-green-700' : ''}`}
+                                    onClick={() => setActiveSection(activeSection === item.id ? '' : item.id)}
+                                >
+                                    <div className="flex items-center">
+                                        <i className={`${item.icon} mr-3`}></i>
+                                        <span>{item.label}</span>
+                                    </div>
+                                    {item.children.length > 0 && (
+                                        <i className={`fas fa-chevron-${activeSection === item.id ? 'down' : 'right'} text-sm`}></i>
+                                    )}
+                                </div>
+                                {activeSection === item.id && item.children.length > 0 && (
+                                    <div className="bg-green-800">
+                                        {item.children.map(child => (
+                                            <div key={child.id} className="px-8 py-2 hover:bg-green-700 cursor-pointer text-sm">
+                                                {child.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </nav>
+            );
+        };
+
+        // Header Component
+        const Header = ({ toggleSidebar, user }) => {
+            const [showNotifications, setShowNotifications] = useState(false);
+            const [showProfile, setShowProfile] = useState(false);
+            const [darkMode, setDarkMode] = useState(false);
+
+            const notifications = [
+                { id: 1, message: 'Low stock: Bakuchiol Serum', type: 'warning', time: '5 min ago' },
+                { id: 2, message: 'New order received', type: 'info', time: '10 min ago' },
+                { id: 3, message: 'Sustainability report ready', type: 'success', time: '1 hour ago' }
+            ];
+
+            return (
+                <header className="fixed top-0 left-0 lg:left-64 right-0 bg-white shadow-sm border-b border-gray-200 z-20">
+                    <div className="px-4 py-3 flex items-center justify-between">
+                        <div className="flex items-center">
+                            <button 
+                                className="lg:hidden mr-4 text-gray-600 hover:text-gray-800"
+                                onClick={toggleSidebar}
+                            >
+                                <i className="fas fa-bars text-xl"></i>
+                            </button>
+                            
+                            <nav className="hidden md:flex items-center text-sm text-gray-600">
+                                <span>Dashboard</span>
+                                <i className="fas fa-chevron-right mx-2 text-xs"></i>
+                                <span className="text-gray-800">Overview</span>
+                            </nav>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
+                            <div className="relative hidden md:block">
+                                <input 
+                                    type="text" 
+                                    placeholder="Search products, orders..."
+                                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500"
+                                />
+                                <i className="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+
+                            <button 
+                                className="text-gray-600 hover:text-gray-800"
+                                onClick={() => setDarkMode(!darkMode)}
+                            >
+                                <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'} text-lg`}></i>
+                            </button>
+
+                            <div className="relative">
+                                <button 
+                                    className="text-gray-600 hover:text-gray-800 relative"
+                                    onClick={() => setShowNotifications(!showNotifications)}
+                                >
+                                    <i className="fas fa-bell text-lg"></i>
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                        {notifications.length}
+                                    </span>
+                                </button>
+                                
+                                {showNotifications && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200">
+                                        <div className="p-3 border-b border-gray-200">
+                                            <h3 className="font-semibold text-gray-800">Notifications</h3>
+                                        </div>
+                                        <div className="max-h-64 overflow-y-auto">
+                                            {notifications.map(notif => (
+                                                <div key={notif.id} className="p-3 border-b border-gray-100 hover:bg-gray-50">
+                                                    <div className="flex items-start">
+                                                        <i className={`fas ${notif.type === 'warning' ? 'fa-exclamation-triangle text-yellow-500' : notif.type === 'info' ? 'fa-info-circle text-blue-500' : 'fa-check-circle text-green-500'} mt-1 mr-3`}></i>
+                                                        <div className="flex-1">
+                                                            <p className="text-sm text-gray-800">{notif.message}</p>
+                                                            <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="relative">
+                                <button 
+                                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
+                                    onClick={() => setShowProfile(!showProfile)}
+                                >
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" 
+                                        alt="Profile" 
+                                        className="w-8 h-8 rounded-full"
+                                    />
+                                    <span className="hidden md:block">{user.name}</span>
+                                    <i className="fas fa-chevron-down text-sm"></i>
+                                </button>
+                                
+                                {showProfile && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                                        <div className="p-3 border-b border-gray-200">
+                                            <p className="font-semibold text-gray-800">{user.name}</p>
+                                            <p className="text-sm text-gray-600">{user.role}</p>
+                                        </div>
+                                        <div className="py-2">
+                                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                <i className="fas fa-user mr-2"></i>Profile Settings
+                                            </a>
+                                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                <i className="fas fa-cog mr-2"></i>Preferences
+                                            </a>
+                                            <hr className="my-2" />
+                                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                <i className="fas fa-sign-out-alt mr-2"></i>Logout
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        // Dashboard Component
+        const Dashboard = () => {
+            const [kpiData, setKpiData] = useState({
+                totalRevenue: 125430,
+                totalOrders: 1247,
+                conversionRate: 28.5,
+                sustainabilityAppeal: 62,
+                avgMargin: 52
+            });
+
+            useEffect(() => {
+                // Simulate real-time data updates
+                const interval = setInterval(() => {
+                    setKpiData(prev => ({
+                        ...prev,
+                        totalOrders: prev.totalOrders + Math.floor(Math.random() * 3),
+                        conversionRate: prev.conversionRate + (Math.random() - 0.5) * 0.1
+                    }));
+                }, 30000);
+                return () => clearInterval(interval);
+            }, []);
+
+            const kpiCards = [
+                {
+                    title: 'Total Revenue',
+                    value: `$${kpiData.totalRevenue.toLocaleString()}`,
+                    change: '+12.5%',
+                    icon: 'fas fa-dollar-sign',
+                    color: 'green'
+                },
+                {
+                    title: 'Total Orders',
+                    value: kpiData.totalOrders.toLocaleString(),
+                    change: '+8.2%',
+                    icon: 'fas fa-shopping-cart',
+                    color: 'blue'
+                },
+                {
+                    title: 'AI Conversion Boost',
+                    value: `${kpiData.conversionRate.toFixed(1)}%`,
+                    change: '+20-30%',
+                    icon: 'fas fa-brain',
+                    color: 'purple'
+                },
+                {
+                    title: 'Sustainability Appeal',
+                    value: `${kpiData.sustainabilityAppeal}%`,
+                    change: 'Target: 60%',
+                    icon: 'fas fa-leaf',
+                    color: 'green'
+                },
+                {
+                    title: 'Avg Product Margin',
+                    value: `${kpiData.avgMargin}%`,
+                    change: '40-60% range',
+                    icon: 'fas fa-chart-line',
+                    color: 'orange'
+                }
+            ];
+
+            return (
+                <div className="p-6">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800 mb-2">Dashboard Overview</h1>
+                        <p className="text-gray-600">Welcome to your EcoGlow Skincare Hub admin panel</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                        {kpiCards.map((card, index) => (
+                            <div key={index} className="bg-white rounded-lg p-6 card-shadow">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                                        card.color === 'green' ? 'bg-green-100 text-green-600' :
+                                        card.color === 'blue' ? 'bg-blue-100 text-blue-600' :
+                                        card.color === 'purple' ? 'bg-purple-100 text-purple-600' :
+                                        'bg-orange-100 text-orange-600'
+                                    }`}>
+                                        <i className={card.icon}></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium text-gray-500 mb-1">{card.title}</h3>
+                                    <p className="text-2xl font-bold text-gray-800 mb-1">{card.value}</p>
+                                    <p className="text-sm text-green-600">{card.change}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div className="bg-white rounded-lg p-6 card-shadow">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">Revenue Trend</h3>
+                            <canvas id="revenueChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-6 card-shadow">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">Product Performance</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Bakuchiol Glow Serum</span>
+                                    <span className="text-sm font-semibold">$2,840</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div className="bg-green-600 h-2 rounded-full" style={{width: '85%'}}></div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Beet Tinted Balm</span>
+                                    <span className="text-sm font-semibold">$1,920</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div className="bg-blue-600 h-2 rounded-full" style={{width: '65%'}}></div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">Complete Glow Kit</span>
+                                    <span className="text-sm font-semibold">$3,150</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div className="bg-purple-600 h-2 rounded-full" style={{width: '95%'}}></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="bg-white rounded-lg p-6 card-shadow">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Orders</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-800">#ORD-1234</p>
+                                        <p className="text-xs text-gray-500">Bakuchiol Serum x2</p>
+                                    </div>
+                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Shipped</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-800">#ORD-1235</p>
+                                        <p className="text-xs text-gray-500">Complete Glow Kit x1</p>
+                                    </div>
+                                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Processing</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-800">#ORD-1236</p>
+                                        <p className="text-xs text-gray-500">Beet Gummies x3</p>
+                                    </div>
+                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Pending</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-6 card-shadow">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">Sustainability Metrics</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="text-sm text-gray-600">Trees Planted</span>
+                                        <span className="text-sm font-semibold">12,000</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-green-600 h-2 rounded-full" style={{width: '80%'}}></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="text-sm text-gray-600">CO2 Offset (kg)</span>
+                                        <span className="text-sm font-semibold">500</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-blue-600 h-2 rounded-full" style={{width: '60%'}}></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="text-sm text-gray-600">Sustainable Packaging</span>
+                                        <span className="text-sm font-semibold">95%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-green-600 h-2 rounded-full" style={{width: '95%'}}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-6 card-shadow">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">AI Quiz Analytics</h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-600">Completion Rate</span>
+                                    <span className="text-sm font-semibold text-green-600">78%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-600">Avg. Questions Answered</span>
+                                    <span className="text-sm font-semibold">8.5/10</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-600">Conversion from Quiz</span>
+                                    <span className="text-sm font-semibold text-green-600">28.5%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-600">Top Skin Type</span>
+                                    <span className="text-sm font-semibold">Combination (42%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Admin App Component
+        const AdminApp = () => {
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+            const [user] = useState({
+                name: 'Sarah Chen',
+                role: 'Super Admin',
+                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
+            });
+
+            const toggleSidebar = () => {
+                setSidebarOpen(!sidebarOpen);
+            };
+
+            useEffect(() => {
+                // Initialize Chart.js for revenue chart
+                const ctx = document.getElementById('revenueChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Revenue',
+                                data: [12000, 19000, 15000, 25000, 22000, 30000],
+                                borderColor: '#228B22',
+                                backgroundColor: 'rgba(34, 139, 34, 0.1)',
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+                    <Header toggleSidebar={toggleSidebar} user={user} />
+                    
+                    <main className="lg:ml-64 pt-16 min-h-screen">
+                        <Dashboard />
+                    </main>
+
+                    {sidebarOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+                            onClick={toggleSidebar}
+                        ></div>
+                    )}
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<AdminApp />, document.getElementById('admin-app'));
+    </script>
+</body>
+</html>

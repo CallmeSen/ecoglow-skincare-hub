@@ -317,7 +317,7 @@ export default function Products() {
                   : "grid-cols-1"
               }`}>
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="bg-gray-200 rounded-xl h-96 animate-pulse" />
+                  <div key={i} className="loading-skeleton rounded-xl h-96" />
                 ))}
               </div>
             ) : sortedProducts.length > 0 ? (
@@ -325,7 +325,7 @@ export default function Products() {
                 <div className="mb-6 text-sm text-gray-600">
                   Showing {sortedProducts.length} of {products.length} products
                 </div>
-                <div className={`grid gap-6 ${
+                <div className={`grid gap-6 stagger-children ${
                   viewMode === "grid" 
                     ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
                     : "grid-cols-1"

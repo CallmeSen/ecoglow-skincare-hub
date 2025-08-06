@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import ProductCard from "@/components/product/product-card";
+import ProductCarousel from "@/components/features/product-carousel";
+import ParallaxSection from "@/components/features/parallax-section";
 import QuizModal from "@/components/quiz/quiz-modal";
 import ImpactStats from "@/components/sustainability/impact-stats";
 import type { Product, BlogPost } from "@shared/schema";
@@ -55,7 +57,8 @@ export default function Home() {
             <Button
               size="lg"
               onClick={() => setIsQuizOpen(true)}
-              className="bg-[var(--berry-red)] hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all"
+              className="bg-[var(--berry-red)] hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all micro-bounce scale-in"
+              data-testid="button-discover-routine"
             >
               Discover Your Routine
             </Button>
@@ -63,7 +66,8 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white bg-white text-[var(--forest-green)] hover:bg-[var(--forest-green)] hover:text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all"
+                className="border-2 border-white bg-white text-[var(--forest-green)] hover:bg-[var(--forest-green)] hover:text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all micro-bounce scale-in"
+                data-testid="button-shop-trending"
               >
                 Shop Trending Products
               </Button>
@@ -92,20 +96,26 @@ export default function Home() {
           {productsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-gray-200 rounded-xl h-96 animate-pulse" />
+                <div key={i} className="loading-skeleton rounded-xl h-96" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {featuredProducts.slice(0, 4).map((product: Product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <ProductCarousel 
+              products={featuredProducts}
+              autoAdvance={true}
+              interval={5000}
+              showArrows={true}
+              className="stagger-children"
+            />
           )}
 
           <div className="text-center mt-12">
             <Link href="/products">
-              <Button size="lg" className="bg-[var(--forest-green)] hover:bg-[var(--dark-green)]">
+              <Button 
+                size="lg" 
+                className="bg-[var(--forest-green)] hover:bg-[var(--dark-green)] micro-bounce hover-glow"
+                data-testid="button-view-all-products"
+              >
                 View All Products
               </Button>
             </Link>

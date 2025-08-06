@@ -71,7 +71,7 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-background text-foreground smooth-scroll;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -94,12 +94,21 @@
     background-size: cover;
   }
 
-  .transition-all {
-    transition: all 0.2s ease-in-out;
+  .page-transition {
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .page-enter {
+    opacity: 0;
+  }
+
+  .page-enter-active {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
   }
 
   .product-card {
-    @apply transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl;
+    @apply transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl hover:scale-105;
   }
 
   .pulse-heart {
@@ -113,6 +122,45 @@
   .fade-in {
     animation: fadeIn 0.5s ease-in-out;
   }
+
+  .slide-in-right {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
+  .scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  .stagger-children > * {
+    animation: stagger 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  .loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(34, 139, 34, 0.3);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .micro-bounce:hover {
+    animation: microBounce 0.3s ease;
+  }
 }
 
 @keyframes pulse {
@@ -121,15 +169,40 @@
   100% { transform: scale(1); }
 }
 
+@keyframes loading {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes microBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
 @keyframes flyToCart {
   0% { transform: scale(1) translateX(0); }
-  50% { transform: scale(0.8) translateX(50px) translateY(-20px); }
-  100% { transform: scale(0.6) translateX(100px) translateY(-40px); }
+  50% { transform: scale(1.1) translateX(100px); }
+  100% { transform: scale(0.8) translateX(200px) translateY(-50px); }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromRight {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes stagger {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* Custom scrollbar */

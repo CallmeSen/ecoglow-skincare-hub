@@ -44,6 +44,11 @@ export default function Footer() {
               Sustainable skincare for the conscious beauty lover. Plant-powered 
               formulations for radiant, healthy skin.
             </p>
+            <div className="space-y-2 text-sm text-gray-400 mb-4">
+              <p>📍 123 Eco Beauty Lane, Green Valley, CA 90210</p>
+              <p>📧 hello@ecoglow.com</p>
+              <p>📞 <a href="tel:+1-555-ECO-GLOW" className="hover:text-white transition-colors">(555) ECO-GLOW</a></p>
+            </div>
             <div className="flex space-x-4">
               <Button variant="ghost" size="sm" className="p-2 hover:text-[var(--sage-green)]">
                 <Instagram className="h-5 w-5" />
@@ -131,7 +136,8 @@ export default function Footer() {
             />
             <Button
               type="submit"
-              className="bg-[var(--berry-red)] hover:bg-red-700 text-white px-8 py-2"
+              className="bg-[var(--berry-red)] hover:bg-red-700 text-white px-8 py-2 micro-bounce hover-glow"
+              data-testid="button-newsletter-subscribe"
             >
               Subscribe & Save
             </Button>
