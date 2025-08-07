@@ -46,13 +46,33 @@ export class ProductsController {
     }
   }
 
+  @Get('search')
+  @ApiOperation({ summary: 'Search products without query' })
+  @ApiResponse({ status: 200, description: 'Returns all products for empty search' })
+  async searchEmpty() {
+    try {
+      console.log('ProductsController searchEmpty - returning all products');
+      return await storage.getProducts();
+    } catch (error) {
+      console.error('Error in empty search:', error);
+      throw new HttpException('Failed to search products', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Get('search/:query')
   @ApiOperation({ summary: 'Search products' })
   @ApiResponse({ status: 200, description: 'Returns search results' })
   async search(@Param('query') query: string) {
     try {
       console.log('ProductsController search - working directly:', query);
-      return await storage.searchProducts(query);
+      
+      // Handle empty or whitespace-only queries
+      if (!query || query.trim().length === 0) {
+        console.log('Empty search query, returning all products');
+        return await storage.getProducts();
+      }
+      
+      return await storage.searchProducts(query.trim());
     } catch (error) {
       console.error('Error in products search:', error);
       throw new HttpException('Failed to search products', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -88,8 +108,10 @@ export class ProductsController {
   @ApiResponse({ status: 201, description: 'Product created successfully' })
   async create(@Body() productData: any) {
     try {
-      return await this.productsService.create(productData);
+      console.log('ProductsController create - working directly');
+      return await storage.createProduct(productData);
     } catch (error) {
+      console.error('Error creating product:', error);
       throw new HttpException('Failed to create product', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -102,12 +124,14 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Product updated successfully' })
   async update(@Param('id') id: string, @Body() productData: any) {
     try {
-      const updatedProduct = await this.productsService.update(id, productData);
+      console.log('ProductsController update - working directly:', id);
+      const updatedProduct = await storage.updateProduct(id, productData);
       if (!updatedProduct) {
         throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
       }
       return updatedProduct;
     } catch (error) {
+      console.error('Error updating product:', error);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -123,12 +147,14 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Product deleted successfully' })
   async remove(@Param('id') id: string) {
     try {
-      const deleted = await this.productsService.remove(id);
+      console.log('ProductsController remove - working directly:', id);
+      const deleted = await storage.deleteProduct(id);
       if (!deleted) {
         throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
       }
       return { message: 'Product deleted successfully' };
     } catch (error) {
+      console.error('Error deleting product:', error);
       if (error instanceof HttpException) {
         throw error;
       }

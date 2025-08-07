@@ -6,7 +6,7 @@ export class UsersService {
   constructor(private databaseService: DatabaseService) {}
 
   async findAll() {
-    return this.databaseService.storage.getAllUsers();
+    return this.databaseService.storage.getUsers();
   }
 
   async findOne(id: string) {

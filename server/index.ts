@@ -2,4 +2,4 @@
 import 'reflect-metadata';
 
 console.log('🚀 Starting NestJS backend...');
-import('./main.js');
+import('./main.ts');
