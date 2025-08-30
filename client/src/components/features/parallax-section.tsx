@@ -17,12 +17,25 @@ export default function ParallaxSection({
   height = "h-96"
 }: ParallaxSectionProps) {
   const [offsetY, setOffsetY] = useState(0);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Use requestAnimationFrame to avoid forced reflow
+    let ticking = false;
+    
     const handleScroll = () => {
-      setOffsetY(window.scrollY * speed);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setOffsetY(window.scrollY * speed);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
+    // Mark as ready after initial setup
+    setIsReady(true);
+    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [speed]);

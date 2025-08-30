@@ -27,7 +27,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     enabled: !!userId,
   });
 
-  const cartItems = items as CartItemWithProduct[];
+  const cartItems = Array.isArray(items) ? (items as CartItemWithProduct[]) : [];
   const itemCount = cartItems.reduce((sum: number, item: CartItemWithProduct) => sum + item.quantity, 0);
   const total = cartItems.reduce((sum: number, item: CartItemWithProduct) => {
     return sum + (parseFloat(item.product?.price || "0") * item.quantity);

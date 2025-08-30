@@ -12,6 +12,7 @@ import { QuizModule } from './modules/quiz/quiz.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { FrontendModule } from './modules/frontend/frontend.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -22,21 +23,22 @@ import { FrontendModule } from './modules/frontend/frontend.module';
       {
         name: 'short',
         ttl: 1000,
-        limit: 3,
+        limit: 10,
       },
       {
         name: 'medium',
         ttl: 10000,
-        limit: 20
+        limit: 50
       },
       {
         name: 'long',
         ttl: 60000,
-        limit: 100
+        limit: 200
       }
     ]),
     DatabaseModule,
     FrontendModule,
+    AdminModule,
     AuthModule,
     ProductsModule,
     UsersModule,

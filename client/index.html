@@ -3,6 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <style>
+      /* Prevent FOUC with optimized styles */
+      #root { 
+        opacity: 0; 
+        transition: opacity 0.3s ease-in-out;
+        min-height: 100vh;
+      }
+      #root.loaded { 
+        opacity: 1; 
+      }
+      
+      /* Prevent layout shift during loading */
+      body {
+        margin: 0;
+        line-height: 1.5;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+      }
+      
+      /* Loading indicator */
+      #root:not(.loaded)::before {
+        content: '';
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #22c55e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 9999;
+      }
+      
+      @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

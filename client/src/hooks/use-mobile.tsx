@@ -3,6 +3,7 @@ import * as React from "react"
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
+  // Initialize with undefined to avoid hydration mismatch
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
@@ -10,8 +11,11 @@ export function useIsMobile() {
     const onChange = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
-    mql.addEventListener("change", onChange)
+    
+    // Set initial value after component mounts to avoid layout shift
     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    
+    mql.addEventListener("change", onChange)
     return () => mql.removeEventListener("change", onChange)
   }, [])
 

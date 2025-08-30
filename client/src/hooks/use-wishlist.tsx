@@ -24,8 +24,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     enabled: !!userId,
   });
 
+  const wishlistItems = Array.isArray(items) ? (items as WishlistItemWithProduct[]) : [];
+
   const isInWishlist = (productId: string) => {
-    return items.some((item: WishlistItemWithProduct) => item.productId === productId);
+    return wishlistItems.some((item: WishlistItemWithProduct) => item.productId === productId);
   };
 
   const addToWishlistMutation = useMutation({
@@ -53,7 +55,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromWishlistMutation = useMutation({
     mutationFn: async (productId: string) => {
-      const item = items.find((item: WishlistItemWithProduct) => item.productId === productId);
+      const item = wishlistItems.find((item: WishlistItemWithProduct) => item.productId === productId);
       if (item) {
         await apiRequest("DELETE", `/api/wishlist/${item.id}`);
       }
@@ -75,7 +77,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   });
 
   const value: WishlistContextType = {
-    items,
+    items: wishlistItems,
     isInWishlist,
     addToWishlist: (productId: string) => addToWishlistMutation.mutateAsync(productId),
     removeFromWishlist: (productId: string) => removeFromWishlistMutation.mutateAsync(productId),
